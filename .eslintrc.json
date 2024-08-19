@@ -1,3 +1,18 @@
 {
-  "extends": "next/core-web-vitals"
+  "$schema": "https://json.schemastore.org/eslintrc",
+  "plugins": [
+    "tailwindcss",
+    "next-on-pages"
+  ],
+  "ignorePatterns": [
+    "components/ui/**/*"
+  ],
+  "extends": [
+    "next/core-web-vitals",
+    "plugin:next-on-pages/recommended",
+    "plugin:tailwindcss/recommended"
+  ],
+  "rules": {
+    "tailwindcss/no-custom-classname": "off"
+  }
 }
