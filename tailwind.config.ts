@@ -21,7 +21,8 @@ const config = {
     extend: {
       // Dot background
       backgroundImage: {
-        dot: 'linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)])'
+        dot: 'radial-gradient(#e5e7eb 1.2px,transparent 1px)',
+        radial: 'radial-gradient(circle 700px at 50% 300px,#C9EBFF,transparent)'
       },
 
       fontFamily: {

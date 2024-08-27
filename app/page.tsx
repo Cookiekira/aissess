@@ -1,7 +1,6 @@
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { FileUploader } from '@/components/file-uploader'
+import { Label } from '@/components/ui/label'
 
 export default function Home() {
   return (
@@ -14,14 +13,9 @@ export default function Home() {
               Upload a PDF or text file and let our AI generate multiple-choice
               questions to test your knowledge.
             </p>
-            <div className="flex w-full flex-col gap-2">
-              <Label htmlFor="file">Upload File</Label>
-              <Input id="file" type="file" accept=".pdf,.txt" />
-            </div>
-            <Button type="submit" className="w-full">
-              Generate Questions
-            </Button>
+            <FileUploader />
           </div>
+
           <div className="rounded-lg bg-muted p-6 shadow-lg">
             <h2 className="mb-4 text-2xl font-bold">Sample Question</h2>
             <div className="space-y-4">
@@ -32,13 +26,13 @@ export default function Home() {
                 <div className="mt-2 grid gap-2">
                   <RadioGroup>
                     <div className="flex items-start gap-2">
-                      <RadioGroupItem value="a" id="a"  />
+                      <RadioGroupItem value="a" id="a" />
                       <Label htmlFor="a" className="leading-4">
                         {'To provide an overview of the company'}
                       </Label>
                     </div>
                     <div className="flex items-start gap-2">
-                      <RadioGroupItem value="b" id="b" className='mt-1' />
+                      <RadioGroupItem value="b" id="b" className="mt-1" />
                       <Label htmlFor="b" className="leading-5">
                         {"To outline the company's financial performance"}
                       </Label>

@@ -1,4 +1,3 @@
-/** @type {import('prettier').Config} */
 module.exports = {
   endOfLine: 'lf',
   semi: false,
@@ -7,5 +6,5 @@ module.exports = {
   arrowParens: 'avoid',
   tabWidth: 2,
   trailingComma: 'none',
-  plugins: ['prettier-plugin-tailwindcsss', 'prettier-plugin-sort-imports']
+  plugins: ['prettier-plugin-tailwindcss', 'prettier-plugin-sort-imports']
 }

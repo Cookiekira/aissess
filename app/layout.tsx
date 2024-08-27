@@ -33,10 +33,11 @@ export default function RootLayout({
           inter.variable,
           'antialiased',
           'font-inter',
-          'bg-[radial-gradient(#e5e7eb_1.2px,transparent_1px)] [background-size:16px_16px]'
+          'bg-dot',
+          'bg-[length:16px_16px]'
         )}
       >
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_700px_at_50%_300px,#C9EBFF,transparent)]"></div>
+        <div className="bg-radial absolute inset-0 -z-10" />
         {children}
       </body>
     </html>
