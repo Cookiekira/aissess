@@ -6,8 +6,6 @@ import { z } from 'zod'
 // @ts-expect-error - See https://github.com/vercel/next.js/issues/58313
 await import('pdfjs-dist/build/pdf.worker.min.mjs')
 
-// const pdfjs = await import('pdfjs-dist')
-
 export type State = {
   fileName: string | null
   questions: string[]
