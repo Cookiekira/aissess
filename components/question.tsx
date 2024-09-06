@@ -1,48 +1,29 @@
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { RadioGroup, RadioGroupItem } from './ui/radio-group'
+import { MCQContent } from '@/lib/actions'
 import { Skeleton } from './ui/skeleton'
-import { Car } from 'lucide-react'
 import { Label } from './ui/label'
 import { cn } from '@/lib/utils'
 
-export function Question() {
+export function Question({ content }: { content: MCQContent }) {
   return (
     <Card className={cn('rounded-lg bg-muted shadow-lg')}>
-      {/* <h2 className="mb-4 text-2xl font-bold">Sample Question</h2> */}
       <CardHeader>
-        <CardTitle>Sample Question</CardTitle>
+        <CardTitle>Question</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <p className="font-medium">
-            What is the main purpose of the document?
-          </p>
+          <p className="font-medium">{content.question}</p>
           <div className="mt-2 grid gap-2">
             <RadioGroup>
-              <div className="flex items-start gap-2">
-                <RadioGroupItem value="a" id="a" />
-                <Label htmlFor="a" className="leading-4">
-                  {'To provide an overview of the company'}
-                </Label>
-              </div>
-              <div className="flex items-start gap-2">
-                <RadioGroupItem value="b" id="b" className="mt-1" />
-                <Label htmlFor="b" className="leading-5">
-                  {"To outline the company's financial performance"}
-                </Label>
-              </div>
-              <div className="flex items-start gap-2">
-                <RadioGroupItem value="c" id="c" />
-                <Label htmlFor="c">
-                  {"To summarize the company's product offerings"}
-                </Label>
-              </div>
-              <div className="flex items-start gap-2">
-                <RadioGroupItem value="d" id="d" />
-                <Label htmlFor="d">
-                  {"To provide an analysis of the company's competitors"}
-                </Label>
-              </div>
+              {content.choices.map((choice, index) => (
+                <div key={index} className="flex items-start gap-2">
+                  <RadioGroupItem value={index.toString()} id={choice} />
+                  <Label htmlFor={index.toString()} className="leading-4">
+                    {choice}
+                  </Label>
+                </div>
+              ))}
             </RadioGroup>
           </div>
         </div>

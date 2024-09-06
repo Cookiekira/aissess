@@ -1,3 +1,3 @@
-declare module 'pdfjs-dist/build/pdf.min.mjs' {
+declare module 'pdfjs-dist/webpack.mjs' {
   export * from 'pdfjs-dist'
 }

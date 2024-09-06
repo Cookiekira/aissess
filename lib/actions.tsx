@@ -6,6 +6,17 @@ import { CoreMessage, generateId } from 'ai'
 import { google } from '@ai-sdk/google'
 import { z } from 'zod'
 
+const MCQ_CONTENT = z.object({
+  question: z.string().describe('Generated question based on the text.'),
+  choices: z
+    .array(z.string())
+    .describe('An array of choices for the question.'),
+  answer_index: z.number().describe('The index of the correct answer.'),
+  explanation: z.string().describe('Explanation for the correct answer.')
+})
+
+export type MCQContent = z.infer<typeof MCQ_CONTENT>
+
 async function submitUserContext(content: string) {
   'use server'
 
@@ -32,18 +43,31 @@ async function submitUserContext(content: string) {
     tools: {
       generate_mcq: {
         description: 'Generate a multiple-choice question based on the text.',
-        parameters: z.object({
-          question: z
-            .string()
-            .describe('Generated question based on the text.'),
-          choices: z
-            .array(z.string())
-            .describe('An array of choices for the question.'),
-          answer_index: z.number().describe('The index of the correct answer.'),
-          explanation: z
-            .string()
-            .describe('Explanation for the correct answer.')
-        })
+        parameters: MCQ_CONTENT,
+        generate: function* (mcq) {
+          const toolCallId = generateId()
+
+          aiState.done({
+            ...aiState.get(),
+            messages: [
+              ...aiState.get().messages,
+              {
+                id: generateId(),
+                role: 'tool',
+                content: [
+                  {
+                    toolName: 'generate_mcq',
+                    type: 'tool-result',
+                    toolCallId,
+                    result: mcq
+                  }
+                ]
+              }
+            ]
+          })
+
+          return <Question content={mcq} />
+        }
       }
     }
   })
@@ -64,7 +88,9 @@ export type UIState = {
 }[]
 
 export const AI = createAI<AIState, UIState>({
-  actions: {},
+  actions: {
+    submitUserContext
+  },
   initialAIState: {
     assessId: generateId(),
     messages: []
@@ -78,7 +104,14 @@ export const getUIStateFromAIState = (aiState: AIState): UIState => {
     .map((message, index) => ({
       id: `${aiState.assessId}-${index}`,
       display: message.content.map(tool => {
-        return tool.toolName === 'mcq' ? <Question /> : <div>Sample</div>
+        return tool.toolName === 'generate_mcq' ? (
+          <>
+            {/* @ts-expect-error */}
+            <Question content={tool.result} />
+          </>
+        ) : (
+          <div>Sample</div>
+        )
       })
     }))
 }

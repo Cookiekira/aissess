@@ -1,7 +1,10 @@
+import { QuestionCarousell } from '@/components/question-carousell'
 import { FileUploader } from '@/components/file-uploader'
-import { Question } from '@/components/question'
+import { AI } from '@/lib/actions'
+import { generateId } from 'ai'
 
 export default function Home() {
+  const id = generateId()
   return (
     <main className="flex min-h-screen flex-col items-center justify-between">
       <div className="container max-w-4xl px-6 md:px-12 lg:px-16">
@@ -15,7 +18,30 @@ export default function Home() {
             <FileUploader />
           </div>
 
-          <Question />
+          <AI
+            initialAIState={{
+              assessId: id,
+              messages: [
+                {
+                  id: generateId(),
+                  role: 'tool',
+                  content: [
+                    {
+                      toolName: 'generate_mcq',
+                      type: 'tool-result',
+                      toolCallId: id,
+                      result: {
+                        question: 'What is the capital of France?',
+                        choices: ['Paris', 'London', 'Berlin', 'Madrid']
+                      }
+                    }
+                  ]
+                }
+              ]
+            }}
+          >
+            <QuestionCarousell />
+          </AI>
         </div>
       </div>
     </main>
