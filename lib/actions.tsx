@@ -66,7 +66,7 @@ async function submitUserContext(content: string) {
             ]
           })
 
-          return <Question content={mcq} />
+          return <Question id={toolCallId} content={mcq} />
         }
       }
     }
@@ -107,7 +107,7 @@ export const getUIStateFromAIState = (aiState: AIState): UIState => {
         return tool.toolName === 'generate_mcq' ? (
           <>
             {/* @ts-expect-error */}
-            <Question content={tool.result} />
+            <Question id={tool.toolCallId} content={tool.result} />
           </>
         ) : (
           <div>Sample</div>
