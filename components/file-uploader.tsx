@@ -1,16 +1,18 @@
 'use client'
 
+import { useActionState, useEffect, useState } from 'react'
 import { extractTextFromFile } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useActionState } from 'react'
+import { useActions } from 'ai/rsc'
 import { z } from 'zod'
 
 const ACCEPTED_FILE_TYPES = ['application/pdf', 'text/plain']
 const MAX_UPLOAD_SIZE = 5 * 1024 * 1024 // 5MB
 
 export type FileState = {
+  context: string | null
   fileName: string | null
   error: string | null
 }
@@ -45,24 +47,44 @@ async function parseFile(
 
   const { file } = validatedFields.data
 
-  const context = await extractTextFromFile(file)
-  console.log(context)
-
-  return {
-    fileName: file.name,
-    error: null
+  try {
+    const context = await extractTextFromFile(file)
+    return {
+      context: context,
+      fileName: file.name,
+      error: null
+    }
+  } catch (e) {
+    return {
+      ...prevState,
+      error:
+        e instanceof Error
+          ? e.message
+          : 'An error occurred while processing the file.'
+    }
   }
 }
 
 export function FileUploader() {
-  const [state, formAction, isPending] = useActionState(parseFile, {
+  const { submitUserContext } = useActions()
+
+  const submit = async (prevState: FileState, formData: FormData) => {
+    const state = await parseFile(prevState, formData)
+    if (state.context) {
+      submitUserContext(state.context)
+    }
+    return state
+  }
+
+  const [state, formAction, isPending] = useActionState(submit, {
+    context: null,
     fileName: null,
     error: null
   })
 
   return (
     <>
-      <form action={formAction} className="w-full">
+      <form action={formAction} className='w-full'>
         <div className="flex flex-col gap-2">
           <Label htmlFor="file">Upload File</Label>
           {!state.fileName ? (

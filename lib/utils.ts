@@ -24,4 +24,7 @@ export async function extractTextFromFile(file: File) {
     return extractedText
 
   }
+  else {
+    return 'Not implemented'
+  }
 }
