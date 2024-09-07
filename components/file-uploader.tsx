@@ -4,7 +4,7 @@ import { extractTextFromFile } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useState } from 'react'
+import { useActionState } from 'react'
 import { z } from 'zod'
 
 const ACCEPTED_FILE_TYPES = ['application/pdf', 'text/plain']
@@ -29,21 +29,24 @@ const FormSchema = z.object({
     )
 })
 
-function parseFile(formData: FormData): FileState {
+async function parseFile(
+  prevState: FileState,
+  formData: FormData
+): Promise<FileState> {
   const validatedFields = FormSchema.safeParse(
     Object.fromEntries(formData.entries())
   )
   if (!validatedFields.success) {
-    console.log(validatedFields.error.errors[0].message)
     return {
-      fileName: null,
+      ...prevState,
       error: validatedFields.error.errors[0].message
     }
   }
 
   const { file } = validatedFields.data
 
-  extractTextFromFile(file)
+  const context = await extractTextFromFile(file)
+  console.log(context)
 
   return {
     fileName: file.name,
@@ -52,19 +55,14 @@ function parseFile(formData: FormData): FileState {
 }
 
 export function FileUploader() {
-  const [state, setState] = useState<FileState>({
+  const [state, formAction, isPending] = useActionState(parseFile, {
     fileName: null,
     error: null
   })
 
   return (
     <>
-      <form
-        action={formData => {
-          // extractTextFromPdf(formData.get('file'))
-        }}
-        className="w-full"
-      >
+      <form action={formAction} className="w-full">
         <div className="flex flex-col gap-2">
           <Label htmlFor="file">Upload File</Label>
           {!state.fileName ? (
@@ -74,14 +72,14 @@ export function FileUploader() {
               id="fileName"
               name="fileName"
               type="text"
-              value={state.fileName}
+              defaultValue={state.fileName}
               readOnly
               disabled
             />
           )}
           {state.error && <p className="text-sm text-red-500">{state.error}</p>}
         </div>
-        <Button type="submit" className="mt-4 w-full">
+        <Button type="submit" disabled={isPending} className="mt-4 w-full">
           Generate Questions
         </Button>
       </form>

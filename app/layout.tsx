@@ -1,7 +1,8 @@
-import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import './globals.css'
+import type { Metadata } from 'next'
+import { AI } from '@/lib/actions'
 import { cn } from '@/lib/utils'
+import './globals.css'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -37,8 +38,8 @@ export default function RootLayout({
           'bg-[length:16px_16px]'
         )}
       >
-        <div className="bg-radial absolute inset-0 -z-10" />
-        {children}
+        <div className="absolute inset-0 -z-10 bg-radial" />
+        <AI>{children}</AI>
       </body>
     </html>
   )

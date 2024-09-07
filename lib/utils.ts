@@ -21,6 +21,7 @@ export async function extractTextFromFile(file: File) {
       )
     ).join(' ')
 
-    console.log(extractedText)
+    return extractedText
+
   }
 }
