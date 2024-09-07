@@ -22,9 +22,13 @@ export async function extractTextFromFile(file: File) {
     ).join(' ')
 
     return extractedText
-
-  }
-  else {
+  } else {
     return 'Not implemented'
   }
+}
+
+export const runAsyncFnWithoutBlocking = (
+  fn: (...args: any) => Promise<any>
+) => {
+  fn()
 }

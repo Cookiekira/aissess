@@ -1,11 +1,12 @@
 'use client'
 
-import { useActionState, useEffect, useState } from 'react'
 import { extractTextFromFile } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { useActions, useUIState } from 'ai/rsc'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useActions } from 'ai/rsc'
+import { useActionState } from 'react'
+import { AI } from '@/lib/actions'
 import { z } from 'zod'
 
 const ACCEPTED_FILE_TYPES = ['application/pdf', 'text/plain']
@@ -67,11 +68,17 @@ async function parseFile(
 
 export function FileUploader() {
   const { submitUserContext } = useActions()
+  const [context, setContext] = useUIState<typeof AI>()
 
   const submit = async (prevState: FileState, formData: FormData) => {
     const state = await parseFile(prevState, formData)
     if (state.context) {
-      submitUserContext(state.context)
+      const res = await submitUserContext(state.context)
+      console.log(res)
+      setContext(currContext => ([
+        ...currContext,
+        res
+      ]))
     }
     return state
   }
@@ -84,7 +91,7 @@ export function FileUploader() {
 
   return (
     <>
-      <form action={formAction} className='w-full'>
+      <form action={formAction} className="w-full">
         <div className="flex flex-col gap-2">
           <Label htmlFor="file">Upload File</Label>
           {!state.fileName ? (

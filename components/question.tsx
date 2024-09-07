@@ -74,9 +74,9 @@ export function QuestionSample() {
       content={{
         question: 'What is the capital of Australia?',
         choices: ['Sydney', 'Canberra', 'Melbourne', 'Perth'],
-        answer_index: 1,
-        explanation:
-          'Canberra is the capital of Australia. It is the largest inland city and the eighth-largest city overall. The city is located at the northern end of the Australian Capital Territory, 280 km (170 mi) south-west of Sydney and 660 km (410 mi) north-east of Melbourne.'
+        // answer_index: 1,
+        // explanation:
+        //   'Canberra is the capital of Australia. It is the largest inland city and the eighth-largest city overall. The city is located at the northern end of the Australian Capital Territory, 280 km (170 mi) south-west of Sydney and 660 km (410 mi) north-east of Melbourne.'
       }}
     />
   )
