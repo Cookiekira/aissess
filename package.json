@@ -18,15 +18,15 @@
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-radio-group": "^1.2.0",
     "@radix-ui/react-slot": "^1.1.0",
-    "ai": "^3.3.26",
+    "ai": "^3.3.28",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.428.0",
-    "next": "15.0.0-canary.120",
+    "next": "15.0.0-canary.146",
     "pdfjs-dist": "^4.6.82",
-    "postcss-preset-env": "^10.0.2",
-    "react": "19.0.0-rc-49496d49-20240814",
-    "react-dom": "19.0.0-rc-49496d49-20240814",
+    "postcss-preset-env": "^10.0.3",
+    "react": "19.0.0-rc-7771d3a7-20240827",
+    "react-dom": "19.0.0-rc-7771d3a7-20240827",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.23.8"
@@ -34,7 +34,7 @@
   "devDependencies": {
     "@cloudflare/next-on-pages": "^1.13.2",
     "@cloudflare/workers-types": "^4.20240903.0",
-    "@tailwindcss/forms": "^0.5.8",
+    "@tailwindcss/forms": "^0.5.9",
     "@tailwindcss/typography": "^0.5.15",
     "@types/node": "^20.16.5",
     "@types/react": "^18.3.5",
@@ -50,7 +50,7 @@
     "tailwindcss": "^3.4.10",
     "typescript": "^5.5.4",
     "vercel": "^36.0.0",
-    "wrangler": "^3.74.0"
+    "wrangler": "^3.75.0"
   },
   "browserslist": [
     "defaults"
