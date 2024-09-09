@@ -1,19 +1,24 @@
 import 'server-only'
 
-import { Question, QuestionSkeleton } from '@/components/question'
-import { createAI, getMutableAIState, streamUI } from 'ai/rsc'
-import { CoreMessage, generateId } from 'ai'
+import { createAI, createStreamableValue, getMutableAIState } from 'ai/rsc'
+import { CoreMessage, DeepPartial, generateId, streamObject } from 'ai'
+import { runAsyncFnWithoutBlocking } from './utils'
+import { Question } from '@/components/question'
 import { google } from '@ai-sdk/google'
 import { z } from 'zod'
 
 const MCQ_CONTENT = z.object({
   question: z.string().describe('Generated question based on the text.'),
-  choices: z.array(z.string()).describe('An array of choices for the question.')
-  // answer_index: z.number().describe('The index of the correct answer.'),
-  // explanation: z.string().describe('Explanation for the correct answer.')
+  choices: z
+    .array(z.string())
+    .describe(
+      'An array of 4 choices for the question. e.g. ["A. Sydney", "B Melbourne", "C. Canberra", "D. Perth"]'
+    ),
+  answer: z.enum(['A', 'B', 'C', 'D']).describe('The correct answer.'),
+  explanation: z.string().describe('Explanation for the correct answer.')
 })
 
-export type MCQContent = z.infer<typeof MCQ_CONTENT>
+export type MCQContent = DeepPartial<z.infer<typeof MCQ_CONTENT>>
 
 async function submitUserContext(content: string) {
   'use server'
@@ -32,52 +37,46 @@ async function submitUserContext(content: string) {
     ]
   })
 
-  const result = await streamUI({
-    model: google('gemini-1.5-flash'),
-    initial: <QuestionSkeleton />,
-    system: `\
-    You are about to generate a multiple-choice question by calling \`generate_mcq\` based on the text you provided.`,
-    messages: aiState.get().messages,
-    tools: {
-      generate_mcq: {
-        description: 'Generate a multiple-choice question based on the text.',
-        parameters: MCQ_CONTENT,
-        generate: function* (mcq) {
-          const toolCallId = generateId()
-
-          aiState.done({
-            ...aiState.get(),
-            messages: [
-              ...aiState.get().messages,
-              {
-                id: generateId(),
-                role: 'tool',
-                content: [
-                  {
-                    toolName: 'generate_mcq',
-                    type: 'tool-result',
-                    toolCallId,
-                    result: mcq
-                  }
-                ]
-              }
-            ]
-          })
-
-          return <Question id={toolCallId} content={mcq} />
-        }
-      }
-    }
+  const stream = createStreamableValue<MCQContent>({
+    question: 'Generating...'
   })
 
-  return {
-    id: generateId(),
-    display: result.value
-  }
-}
+  const mcqId = generateId()
 
+  runAsyncFnWithoutBlocking(async () => {
+    const { partialObjectStream } = await streamObject({
+      model: google('gemini-1.5-flash'),
+      system: `\
+    You are about to generate a multiple-choice question by calling \`generate_mcq\` based on the text you provided.`,
+      messages: aiState.get().messages,
+      schema: MCQ_CONTENT
+    })
+
+    let finalObject: DeepPartial<MCQContent> = {}
+    for await (const partialObject of partialObjectStream) {
+      stream.update(partialObject)
+      finalObject = partialObject
+    }
+
+    aiState.done({
+      ...aiState.get(),
+      messages: [
+        ...aiState.get().messages,
+        {
+          id: generateId(),
+          role: 'assistant',
+          content: JSON.stringify(finalObject)
+        }
+      ]
+    })
+    stream.done()
+  })
+
+  return { mcqId, mcqStream: stream.value }
+}
 export type Message = CoreMessage & {
   id: string
+  isMCQ?: boolean
 }
 
 export type AIState = {

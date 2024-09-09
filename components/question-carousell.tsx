@@ -1,12 +1,12 @@
 'use client'
 
-import { AI } from '@/lib/actions'
-import { useUIState } from 'ai/rsc'
+import { useAIState, useUIState } from 'ai/rsc'
 import { QuestionSample } from './question'
+import { AI } from '@/lib/actions'
 
 export function QuestionCarousell() {
   const [uiState] = useUIState<typeof AI>()
-  console.log(uiState)
+
   return (
     <div>
       {uiState.length > 0 ? (

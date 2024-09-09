@@ -1,12 +1,13 @@
 'use client'
 
+import { readStreamableValue, useActions, useUIState } from 'ai/rsc'
+import { Question, QuestionSkeleton } from './question'
 import { extractTextFromFile } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { useActions, useUIState } from 'ai/rsc'
+import { AI, MCQContent } from '@/lib/actions'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useActionState } from 'react'
-import { AI } from '@/lib/actions'
 import { z } from 'zod'
 
 const ACCEPTED_FILE_TYPES = ['application/pdf', 'text/plain']
@@ -19,7 +20,6 @@ export type FileState = {
 }
 
 const FormSchema = z.object({
-  // pdf or txt file
   file: z
     .instanceof(File)
     .refine(
@@ -68,17 +68,29 @@ async function parseFile(
 
 export function FileUploader() {
   const { submitUserContext } = useActions()
-  const [context, setContext] = useUIState<typeof AI>()
+  const [uiState, setUiState] = useUIState<typeof AI>()
 
   const submit = async (prevState: FileState, formData: FormData) => {
     const state = await parseFile(prevState, formData)
     if (state.context) {
-      const res = await submitUserContext(state.context)
-      console.log(res)
-      setContext(currContext => ([
-        ...currContext,
-        res
-      ]))
+      setUiState([
+        {
+          id: 'skeleton',
+          display: <QuestionSkeleton />
+        }
+      ])
+      const { mcqId, mcqStream } = await submitUserContext(state.context)
+      for await (const mcq of readStreamableValue<MCQContent>(mcqStream)) {
+        if (mcq && Object.keys(mcq).length > 0) {
+          setUiState([
+            ...uiState,
+            {
+              id: mcqId,
+              display: <Question id={mcqId} content={mcq} />
+            }
+          ])
+        }
+      }
     }
     return state
   }

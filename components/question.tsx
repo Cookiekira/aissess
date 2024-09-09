@@ -13,29 +13,38 @@ export function Question({ id, content }: { id: string; content: MCQContent }) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <p className="font-medium">{content.question}</p>
+          <p className="font-medium">{content.question ?? 'Generating'}</p>
           <div className="mt-2 grid gap-2">
-            <RadioGroup>
-              {content.choices.map((choice, index) => (
-                <div
-                  key={index}
-                  className={cn(
-                    'flex items-start gap-2  hover:shadow-md hover:bg-sky-50 p-2 rounded-lg'
-                  )}
-                >
-                  <RadioGroupItem
-                    value={index.toString()}
-                    id={`${id}-${index}`}
-                  />
-                  <Label
-                    htmlFor={`${id}-${index}`}
-                    className="cursor-pointer leading-4"
+            {content.choices && content.choices.length > 0 ? (
+              <RadioGroup>
+                {content.choices.map((choice, index) => (
+                  <div
+                    key={index}
+                    className={cn(
+                      'flex items-start gap-2  hover:shadow-md hover:bg-sky-50 p-2 rounded-lg'
+                    )}
                   >
-                    {choice}
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
+                    <RadioGroupItem
+                      value={index.toString()}
+                      id={`${id}-${index}`}
+                    />
+                    <Label
+                      htmlFor={`${id}-${index}`}
+                      className="cursor-pointer leading-4"
+                    >
+                      {choice}
+                    </Label>
+                  </div>
+                ))}
+              </RadioGroup>
+            ) : (
+              <>
+                <Skeleton className="h-10 bg-muted-foreground" />
+                <Skeleton className="h-10 bg-muted-foreground" />
+                <Skeleton className="h-10 bg-muted-foreground" />
+                <Skeleton className="h-10 bg-muted-foreground" />
+              </>
+            )}
           </div>
         </div>
         <div>
@@ -54,10 +63,11 @@ export function QuestionSkeleton() {
   return (
     <Card className={cn('rounded-lg bg-muted shadow-lg')}>
       <CardHeader>
-        <CardTitle>Generating...</CardTitle>
+        <CardTitle>Question</CardTitle>
       </CardHeader>
 
       <CardContent className="space-y-4">
+        <p className="animate-pulse font-medium">{'Generating...'}</p>
         <Skeleton className="h-10 bg-muted-foreground" />
         <Skeleton className="h-10 bg-muted-foreground" />
         <Skeleton className="h-10 bg-muted-foreground" />
@@ -73,10 +83,10 @@ export function QuestionSample() {
       id="sample"
       content={{
         question: 'What is the capital of Australia?',
-        choices: ['Sydney', 'Canberra', 'Melbourne', 'Perth'],
-        // answer_index: 1,
-        // explanation:
-        //   'Canberra is the capital of Australia. It is the largest inland city and the eighth-largest city overall. The city is located at the northern end of the Australian Capital Territory, 280 km (170 mi) south-west of Sydney and 660 km (410 mi) north-east of Melbourne.'
+        choices: ['A. Sydney', 'B. Canberra', 'C. Melbourne', 'D. Perth'],
+        answer: 'B',
+        explanation:
+          'Canberra is the capital of Australia. It is the largest inland city and the eighth-largest city overall. The city is located at the northern end of the Australian Capital Territory, 280 km (170 mi) south-west of Sydney and 660 km (410 mi) north-east of Melbourne.'
       }}
     />
   )
