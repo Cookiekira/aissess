@@ -1,11 +1,26 @@
+'use client'
+
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { RadioGroup, RadioGroupItem } from './ui/radio-group'
 import { MCQContent } from '@/lib/actions'
 import { Skeleton } from './ui/skeleton'
 import { Label } from './ui/label'
 import { cn } from '@/lib/utils'
+import { useState } from 'react'
+
+const ANSWER = ['A', 'B', 'C', 'D']
 
 export function Question({ id, content }: { id: string; content: MCQContent }) {
+  const [selected, setSelected] = useState<string>()
+
+  const isRightAnswer = (input: string) => {
+    return input === content.answer
+  }
+
+  const isSelected = (choiceIndex: number) => {
+    return selected === ANSWER[choiceIndex]
+  }
+
   return (
     <Card className={cn('rounded-lg bg-muted shadow-lg')}>
       <CardHeader>
@@ -13,24 +28,48 @@ export function Question({ id, content }: { id: string; content: MCQContent }) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <p className="font-medium">{content.question ?? 'Generating'}</p>
+          <p className="font-medium">{content.question ?? 'Generating...'}</p>
           <div className="mt-2 grid gap-2">
             {content.choices && content.choices.length > 0 ? (
-              <RadioGroup>
+              <RadioGroup value={selected} onValueChange={setSelected}>
                 {content.choices.map((choice, index) => (
                   <div
                     key={index}
                     className={cn(
-                      'flex items-start gap-2  hover:shadow-md hover:bg-sky-50 p-2 rounded-lg'
+                      `flex items-start gap-2 p-2 rounded-lg
+
+                       hover:shadow-md hover:bg-sky-100
+                       [&:has([data-state="checked"])]:shadow-md
+                       `,
+                      // Check if the selected answer is the correct answer
+                      isSelected(index) && isRightAnswer(ANSWER[index])
+                        ? `[&:has([data-state="checked"])]:bg-success`
+                        : `[&:has([data-state="checked"])]:bg-destructive`,
+
+                      selected &&
+                        !isSelected(index) &&
+                        isRightAnswer(ANSWER[index]) &&
+                        'bg-success hover:bg-success shadow-md'
                     )}
                   >
                     <RadioGroupItem
-                      value={index.toString()}
+                      value={ANSWER[index]}
                       id={`${id}-${index}`}
+                      className="peer"
                     />
                     <Label
                       htmlFor={`${id}-${index}`}
-                      className="cursor-pointer leading-4"
+                      className={cn(
+                        'cursor-pointer leading-4',
+                        isRightAnswer(ANSWER[index])
+                          ? 'peer-data-[state=checked]:text-success-foreground'
+                          : 'peer-data-[state=checked]:text-destructive-foreground',
+
+                        selected &&
+                          !isSelected(index) &&
+                          isRightAnswer(ANSWER[index]) &&
+                          'text-success-foreground'
+                      )}
                     >
                       {choice}
                     </Label>

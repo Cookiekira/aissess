@@ -1,7 +1,7 @@
 'use client'
 
-import { useAIState, useUIState } from 'ai/rsc'
 import { QuestionSample } from './question'
+import { useUIState } from 'ai/rsc'
 import { AI } from '@/lib/actions'
 
 export function QuestionCarousell() {
