@@ -45,11 +45,17 @@ async function submitUserContext(content: string) {
 
   runAsyncFnWithoutBlocking(async () => {
     const { partialObjectStream } = await streamObject({
-      model: google('gemini-1.5-flash'),
-      system: `\
-    You are about to generate a multiple-choice question by calling \`generate_mcq\` based on the text you provided.`,
+      model: google('gemini-1.5-flash', {
+        // ? Workaround for right order of the output
+        structuredOutputs: false
+      }),
+      system: `You are about to generate a multiple-choice question based on the given text.\
+               The result order should be: question, choices, answer, explanation.`,
       messages: aiState.get().messages,
-      schema: MCQ_CONTENT
+      schema: MCQ_CONTENT,
+      schemaName: 'Multiple Choice Question',
+      schemaDescription:
+        'A multiple-choice question with 4 options, followed by the answer and explanation, in the order of: question, choices, answer, explanation.'
     })
 
     let finalObject: DeepPartial<MCQContent> = {}

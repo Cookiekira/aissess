@@ -61,6 +61,7 @@ export function Question({ id, content }: { id: string; content: MCQContent }) {
                       htmlFor={`${id}-${index}`}
                       className={cn(
                         'cursor-pointer leading-4',
+
                         isRightAnswer(ANSWER[index])
                           ? 'peer-data-[state=checked]:text-success-foreground'
                           : 'peer-data-[state=checked]:text-destructive-foreground',
@@ -86,13 +87,12 @@ export function Question({ id, content }: { id: string; content: MCQContent }) {
             )}
           </div>
         </div>
-        <div>
-          <p className="font-medium">What is the correct answer?</p>
-          <p className="text-muted-foreground">
-            The main purpose of the document is to provide an overview of the
-            company.
-          </p>
-        </div>
+        {!!selected && content.answer && (
+          <div>
+            <p className="font-medium">{`The answer is ${content.answer}`}</p>
+            <p className="text-muted-foreground">{content.explanation}</p>
+          </div>
+        )}
       </CardContent>
     </Card>
   )
