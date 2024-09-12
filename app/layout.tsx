@@ -3,7 +3,10 @@ import { Inter } from 'next/font/google'
 import type { Metadata } from 'next'
 import { AI } from '@/lib/actions'
 import { cn } from '@/lib/utils'
+import Script from 'next/script'
 import './globals.css'
+
+export const runtime = 'edge'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -42,6 +45,7 @@ export default function RootLayout({
         <div className="absolute inset-0 -z-10 bg-radial" />
         <AI>{children}</AI>
         <Toaster />
+        <Script src="/pdf.min.mjs" strategy='beforeInteractive' type="module" />
       </body>
     </html>
   )

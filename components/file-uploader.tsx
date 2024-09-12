@@ -3,8 +3,8 @@
 import { readStreamableValue, useActions, useUIState } from 'ai/rsc'
 import { AI, MCQContent, UIState } from '@/lib/actions'
 import { Question, QuestionSkeleton } from './question'
+import { usePdfParser } from '@/hooks/use-pdf-parser'
 import { useActionState, useCallback } from 'react'
-import { extractTextFromFile } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -35,7 +35,11 @@ const FormSchema = z.object({
     )
 })
 
-async function parseFile(prevState: FileState, formData: FormData) {
+async function parseFile(
+  prevState: FileState,
+  formData: FormData,
+  parser: ReturnType<typeof usePdfParser>
+) {
   const validatedFields = FormSchema.safeParse(
     Object.fromEntries(formData.entries())
   )
@@ -49,7 +53,13 @@ async function parseFile(prevState: FileState, formData: FormData) {
   const { file } = validatedFields.data
 
   try {
-    const context = await extractTextFromFile(file)
+    let context = ''
+    if (file.type === 'application/pdf') {
+      context = await (await parser)(file)
+    } else {
+      context = await file.text()
+    }
+
     if (context.length === 0) {
       return {
         ...prevState,
@@ -76,6 +86,7 @@ export function FileUploader() {
   const { submitUserContext } = useActions()
   const { toast } = useToast()
   const [uiState, setUiState] = useUIState<typeof AI>()
+  const parser = usePdfParser()
 
   const updateQuestionUI = useCallback(
     async (input: string) => {
@@ -114,7 +125,7 @@ export function FileUploader() {
 
   const submit = useCallback(
     async (prevState: FileState, formData: FormData) => {
-      const state = await parseFile(prevState, formData)
+      const state = await parseFile(prevState, formData, parser)
 
       if (!state.error) {
         updateQuestionUI(state.context)
@@ -128,7 +139,7 @@ export function FileUploader() {
       }
       return state
     },
-    [toast, updateQuestionUI]
+    [parser, toast, updateQuestionUI]
   )
 
   const { trigger, isMutating: isReGenerating } = useSWRMutation(
@@ -141,6 +152,7 @@ export function FileUploader() {
     fileName: '',
     error: null
   })
+
 
   return (
     <>

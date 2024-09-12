@@ -32,6 +32,7 @@ export function QuestionCarousell() {
 
   useEffect(() => {
     return api?.destroy
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (

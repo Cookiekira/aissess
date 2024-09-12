@@ -1,3 +1,7 @@
-declare module 'pdfjs-dist/webpack.mjs' {
-  export * from 'pdfjs-dist'
+export {}
+
+declare global {
+  interface Window {
+    pdfjsLib: typeof import('pdfjs-dist/types/src/pdf')
+  }
 }
