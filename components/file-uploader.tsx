@@ -1,14 +1,15 @@
 'use client'
 
 import { readStreamableValue, useActions, useUIState } from 'ai/rsc'
+import { AI, MCQContent, UIState } from '@/lib/actions'
 import { Question, QuestionSkeleton } from './question'
+import { useActionState, useCallback } from 'react'
 import { extractTextFromFile } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { AI, MCQContent } from '@/lib/actions'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
-import { useActionState } from 'react'
+import useSWRMutation from 'swr/mutation'
 import { z } from 'zod'
 
 const ACCEPTED_FILE_TYPES = ['application/pdf', 'text/plain']
@@ -35,7 +36,6 @@ const FormSchema = z.object({
 })
 
 async function parseFile(prevState: FileState, formData: FormData) {
-  console.log(Object.fromEntries(formData.entries()))
   const validatedFields = FormSchema.safeParse(
     Object.fromEntries(formData.entries())
   )
@@ -74,38 +74,67 @@ async function parseFile(prevState: FileState, formData: FormData) {
 
 export function FileUploader() {
   const { submitUserContext } = useActions()
-  const [uiState, setUiState] = useUIState<typeof AI>()
   const { toast } = useToast()
+  const [uiState, setUiState] = useUIState<typeof AI>()
 
-  const submit = async (prevState: FileState, formData: FormData) => {
-    const state = await parseFile(prevState, formData)
-    if (!state.error) {
-      setUiState([
+  const updateQuestionUI = useCallback(
+    async (input: string) => {
+      console.log('Trigger...')
+      setUiState(prevState => [
+        ...prevState,
         {
           id: 'skeleton',
           display: <QuestionSkeleton />
         }
       ])
-      const { mcqId, mcqStream } = await submitUserContext(state.context)
+      const { mcqId, mcqStream } = await submitUserContext(input)
       for await (const mcq of readStreamableValue<MCQContent>(mcqStream)) {
         if (mcq && Object.keys(mcq).length > 0) {
-          setUiState([
-            ...uiState,
-            {
-              id: mcqId,
-              display: <Question id={mcqId} content={mcq} />
-            }
-          ])
+          setUiState(prevState =>
+            prevState.reduce(
+              (acc: UIState, curr: UIState[number]) => {
+                if (curr.id === mcqId || curr.id === 'skeleton') {
+                  // Refreshing the question currently being generated
+                  return acc
+                }
+                return [curr, ...acc]
+              },
+              [
+                {
+                  id: mcqId,
+                  display: <Question id={mcqId} content={mcq} />
+                }
+              ]
+            )
+          )
         }
       }
-    } else {
-      toast({
-        title: 'Error',
-        description: state.error
-      })
-    }
-    return state
-  }
+    },
+    [setUiState, submitUserContext]
+  )
+
+  const submit = useCallback(
+    async (prevState: FileState, formData: FormData) => {
+      const state = await parseFile(prevState, formData)
+
+      if (!state.error) {
+        updateQuestionUI(state.context)
+      } else {
+        toast({
+          title: 'Error',
+          description: state.error,
+          variant: 'destructive'
+        })
+      }
+      return state
+    },
+    [toast, updateQuestionUI]
+  )
+
+  const { trigger, isMutating: isReGenerating } = useSWRMutation(
+    're-generate-question',
+    async () => await updateQuestionUI('Next Question')
+  )
 
   const [state, formAction, isPending] = useActionState(submit, {
     context: '',
@@ -132,9 +161,22 @@ export function FileUploader() {
           )}
           {state.error && <p className="text-sm text-red-500">{state.error}</p>}
         </div>
-        <Button type="submit" disabled={isPending} className="mt-4 w-full">
-          Generate Questions
-        </Button>
+        {!state.fileName ? (
+          <Button type="submit" disabled={isPending} className="mt-4 w-full">
+            Generate Question
+          </Button>
+        ) : (
+          <Button
+            type="button"
+            onClick={() => {
+              trigger()
+            }}
+            disabled={isReGenerating || isPending}
+            className="mt-4 w-full"
+          >
+            Re-generate Question
+          </Button>
+        )}
       </form>
     </>
   )
