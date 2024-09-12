@@ -23,7 +23,8 @@ export async function extractTextFromFile(file: File) {
 
     return extractedText
   } else {
-    return 'Not implemented'
+    const text = await file.text()
+    return text
   }
 }
 
