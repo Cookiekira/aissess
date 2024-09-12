@@ -2,9 +2,9 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { RadioGroup, RadioGroupItem } from './ui/radio-group'
+import React, { memo, useState } from 'react'
 import { MCQContent } from '@/lib/actions'
 import { Skeleton } from './ui/skeleton'
-import { memo, useState } from 'react'
 import { Label } from './ui/label'
 import { cn } from '@/lib/utils'
 
@@ -12,10 +12,12 @@ const ANSWER = ['A', 'B', 'C', 'D']
 
 export const Question = memo(function Question({
   id,
-  content
+  content,
+  className
 }: {
   id: string
   content: MCQContent
+  className?: React.HTMLAttributes<'div'>['className']
 }) {
   const [selected, setSelected] = useState<string>()
 
@@ -28,7 +30,7 @@ export const Question = memo(function Question({
   }
 
   return (
-    <Card className={cn('rounded-lg bg-muted shadow-md')}>
+    <Card className={cn('rounded-lg bg-muted shadow-md', className)}>
       <CardHeader>
         <CardTitle>Question</CardTitle>
       </CardHeader>
@@ -122,9 +124,14 @@ export function QuestionSkeleton() {
   )
 }
 
-export function QuestionSample() {
+export function QuestionSample({
+  className
+}: {
+  className?: React.HTMLAttributes<'div'>['className']
+}) {
   return (
     <Question
+      className={className}
       id="sample"
       content={{
         question: 'What is the capital of Australia?',

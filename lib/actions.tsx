@@ -69,7 +69,7 @@ async function submitUserContext(content: string) {
       messages: [
         ...aiState.get().messages,
         {
-          id: generateId(),
+          id: mcqId,
           role: 'assistant',
           content: JSON.stringify(finalObject)
         }
