@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { AI, MCQContent } from '@/lib/actions'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useToast } from '@/hooks/use-toast'
 import { useActionState } from 'react'
 import { z } from 'zod'
 
@@ -14,14 +15,15 @@ const ACCEPTED_FILE_TYPES = ['application/pdf', 'text/plain']
 const MAX_UPLOAD_SIZE = 5 * 1024 * 1024 // 5MB
 
 export type FileState = {
-  context: string | null
-  fileName: string | null
   error: string | null
+  context: string
+  fileName: string
 }
 
 const FormSchema = z.object({
   file: z
     .instanceof(File)
+    .refine(file => file.name !== '', 'Please select a file to upload.')
     .refine(
       file => file && file.size !== 0 && file.size <= MAX_UPLOAD_SIZE,
       'Max file size is 5MB.'
@@ -32,10 +34,8 @@ const FormSchema = z.object({
     )
 })
 
-async function parseFile(
-  prevState: FileState,
-  formData: FormData
-): Promise<FileState> {
+async function parseFile(prevState: FileState, formData: FormData) {
+  console.log(Object.fromEntries(formData.entries()))
   const validatedFields = FormSchema.safeParse(
     Object.fromEntries(formData.entries())
   )
@@ -50,6 +50,12 @@ async function parseFile(
 
   try {
     const context = await extractTextFromFile(file)
+    if (context.length === 0) {
+      return {
+        ...prevState,
+        error: 'No text found in the file.'
+      }
+    }
     return {
       context: context,
       fileName: file.name,
@@ -69,10 +75,11 @@ async function parseFile(
 export function FileUploader() {
   const { submitUserContext } = useActions()
   const [uiState, setUiState] = useUIState<typeof AI>()
+  const { toast } = useToast()
 
   const submit = async (prevState: FileState, formData: FormData) => {
     const state = await parseFile(prevState, formData)
-    if (state.context) {
+    if (!state.error) {
       setUiState([
         {
           id: 'skeleton',
@@ -91,13 +98,18 @@ export function FileUploader() {
           ])
         }
       }
+    } else {
+      toast({
+        title: 'Error',
+        description: state.error
+      })
     }
     return state
   }
 
   const [state, formAction, isPending] = useActionState(submit, {
-    context: null,
-    fileName: null,
+    context: '',
+    fileName: '',
     error: null
   })
 

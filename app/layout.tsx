@@ -1,3 +1,4 @@
+import { Toaster } from '@/components/ui/toaster'
 import { Inter } from 'next/font/google'
 import type { Metadata } from 'next'
 import { AI } from '@/lib/actions'
@@ -40,6 +41,7 @@ export default function RootLayout({
       >
         <div className="absolute inset-0 -z-10 bg-radial" />
         <AI>{children}</AI>
+        <Toaster />
       </body>
     </html>
   )
