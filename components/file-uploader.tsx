@@ -79,7 +79,6 @@ export function FileUploader() {
 
   const updateQuestionUI = useCallback(
     async (input: string) => {
-      console.log('Trigger...')
       setUiState(prevState => [
         ...prevState,
         {
