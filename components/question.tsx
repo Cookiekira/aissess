@@ -4,13 +4,19 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { RadioGroup, RadioGroupItem } from './ui/radio-group'
 import { MCQContent } from '@/lib/actions'
 import { Skeleton } from './ui/skeleton'
+import { memo, useState } from 'react'
 import { Label } from './ui/label'
 import { cn } from '@/lib/utils'
-import { useState } from 'react'
 
 const ANSWER = ['A', 'B', 'C', 'D']
 
-export function Question({ id, content }: { id: string; content: MCQContent }) {
+export const Question = memo(function Question({
+  id,
+  content
+}: {
+  id: string
+  content: MCQContent
+}) {
   const [selected, setSelected] = useState<string>()
 
   const isRightAnswer = (input: string) => {
@@ -22,7 +28,7 @@ export function Question({ id, content }: { id: string; content: MCQContent }) {
   }
 
   return (
-    <Card className={cn('rounded-lg bg-muted shadow-lg')}>
+    <Card className={cn('rounded-lg bg-muted shadow-md')}>
       <CardHeader>
         <CardTitle>Question</CardTitle>
       </CardHeader>
@@ -96,7 +102,7 @@ export function Question({ id, content }: { id: string; content: MCQContent }) {
       </CardContent>
     </Card>
   )
-}
+})
 
 export function QuestionSkeleton() {
   return (

@@ -122,7 +122,8 @@ export function FileUploader() {
         toast({
           title: 'Error',
           description: state.error,
-          variant: 'destructive'
+          variant: 'destructive',
+          duration: 2000
         })
       }
       return state

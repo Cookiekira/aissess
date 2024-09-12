@@ -23,6 +23,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "embla-carousel-react": "^8.2.1",
+    "foxact": "^0.2.38",
     "lucide-react": "^0.428.0",
     "next": "15.0.0-canary.146",
     "pdfjs-dist": "^4.6.82",
