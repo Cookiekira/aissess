@@ -45,7 +45,11 @@ export default function RootLayout({
         <div className="absolute inset-0 -z-10 bg-radial" />
         <AI>{children}</AI>
         <Toaster />
-        <Script src="/pdf.min.mjs" strategy='beforeInteractive' type="module" />
+        <Script
+          src="/lib/pdf.min.mjs"
+          type="module"
+          strategy="beforeInteractive"
+        />
       </body>
     </html>
   )

@@ -38,7 +38,7 @@ const FormSchema = z.object({
 async function parseFile(
   prevState: FileState,
   formData: FormData,
-  parser: ReturnType<typeof usePdfParser>
+  parser: ReturnType<typeof usePdfParser>['parser']
 ) {
   const validatedFields = FormSchema.safeParse(
     Object.fromEntries(formData.entries())
@@ -86,7 +86,7 @@ export function FileUploader() {
   const { submitUserContext } = useActions()
   const { toast } = useToast()
   const [uiState, setUiState] = useUIState<typeof AI>()
-  const parser = usePdfParser()
+  const { parser } = usePdfParser()
 
   const updateQuestionUI = useCallback(
     async (input: string) => {
@@ -152,7 +152,6 @@ export function FileUploader() {
     fileName: '',
     error: null
   })
-
 
   return (
     <>
