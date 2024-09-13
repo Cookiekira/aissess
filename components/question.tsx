@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { RadioGroup, RadioGroupItem } from './ui/radio-group'
+import { AnimatedText } from './animated-text'
 import React, { memo, useState } from 'react'
 import { MCQContent } from '@/lib/actions'
 import { Skeleton } from './ui/skeleton'
@@ -36,7 +37,9 @@ export const Question = memo(function Question({
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <p className="font-medium">{content.question ?? 'Generating...'}</p>
+          <p className="font-medium">
+            <AnimatedText text={content.question ?? 'Generating...'} />
+          </p>
           <div className="mt-2 grid gap-2">
             {content.choices && content.choices.length > 0 ? (
               <RadioGroup value={selected} onValueChange={setSelected}>
@@ -80,7 +83,7 @@ export const Question = memo(function Question({
                           'text-success-foreground'
                       )}
                     >
-                      {choice}
+                      <AnimatedText text={choice ?? ''} />
                     </Label>
                   </div>
                 ))}
@@ -98,7 +101,9 @@ export const Question = memo(function Question({
         {!!selected && content.answer && (
           <div>
             <p className="font-medium">{`The answer is ${content.answer}`}</p>
-            <p className="text-muted-foreground">{content.explanation}</p>
+            <p className="text-muted-foreground">
+              <AnimatedText text={content.explanation ?? ''} />
+            </p>
           </div>
         )}
       </CardContent>
@@ -114,7 +119,9 @@ export function QuestionSkeleton() {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        <p className="animate-pulse font-medium">{'Generating...'}</p>
+        <p className="animate-pulse font-medium">
+          <AnimatedText text={'Generating...'} />
+        </p>
         <Skeleton className="h-10 bg-muted-foreground" />
         <Skeleton className="h-10 bg-muted-foreground" />
         <Skeleton className="h-10 bg-muted-foreground" />

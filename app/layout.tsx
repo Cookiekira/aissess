@@ -1,4 +1,5 @@
 import { Toaster } from '@/components/ui/toaster'
+import { Provider } from '@/components/provider'
 import { Inter } from 'next/font/google'
 import type { Metadata } from 'next'
 import { AI } from '@/lib/actions'
@@ -43,7 +44,9 @@ export default function RootLayout({
         )}
       >
         <div className="absolute inset-0 -z-10 bg-radial" />
-        <AI>{children}</AI>
+        <AI>
+          <Provider>{children}</Provider>
+        </AI>
         <Toaster />
         <Script
           src="/lib/pdf.min.mjs"

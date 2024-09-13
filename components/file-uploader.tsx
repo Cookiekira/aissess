@@ -1,10 +1,10 @@
 'use client'
 
 import { readStreamableValue, useActions, useUIState } from 'ai/rsc'
+import { useActionState, useCallback, useTransition } from 'react'
 import { AI, MCQContent, UIState } from '@/lib/actions'
 import { Question, QuestionSkeleton } from './question'
 import { usePdfParser } from '@/hooks/use-pdf-parser'
-import { useActionState, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -87,6 +87,7 @@ export function FileUploader() {
   const { toast } = useToast()
   const [uiState, setUiState] = useUIState<typeof AI>()
   const { parser } = usePdfParser()
+  const [isUpdatingUI, startTransition] = useTransition()
 
   const updateQuestionUI = useCallback(
     async (input: string) => {
@@ -100,23 +101,25 @@ export function FileUploader() {
       const { mcqId, mcqStream } = await submitUserContext(input)
       for await (const mcq of readStreamableValue<MCQContent>(mcqStream)) {
         if (mcq && Object.keys(mcq).length > 0) {
-          setUiState(prevState =>
-            prevState.reduce(
-              (acc: UIState, curr: UIState[number]) => {
-                if (curr.id === mcqId || curr.id === 'skeleton') {
-                  // Refreshing the question currently being generated
-                  return acc
-                }
-                return [curr, ...acc]
-              },
-              [
-                {
-                  id: mcqId,
-                  display: <Question id={mcqId} content={mcq} />
-                }
-              ]
+          startTransition(() => {
+            setUiState(prevState =>
+              prevState.reduce(
+                (acc: UIState, curr: UIState[number]) => {
+                  if (curr.id === mcqId || curr.id === 'skeleton') {
+                    // Refreshing the question currently being generated
+                    return acc
+                  }
+                  return [curr, ...acc]
+                },
+                [
+                  {
+                    id: mcqId,
+                    display: <Question id={mcqId} content={mcq} />
+                  }
+                ]
+              )
             )
-          )
+          })
         }
       }
     },
@@ -173,7 +176,11 @@ export function FileUploader() {
           {state.error && <p className="text-sm text-red-500">{state.error}</p>}
         </div>
         {!state.fileName ? (
-          <Button type="submit" disabled={isPending} className="mt-4 w-full">
+          <Button
+            type="submit"
+            disabled={isPending || isUpdatingUI}
+            className="mt-4 w-full"
+          >
             Generate Question
           </Button>
         ) : (
@@ -182,7 +189,7 @@ export function FileUploader() {
             onClick={() => {
               trigger()
             }}
-            disabled={isReGenerating || isPending}
+            disabled={isReGenerating || isPending || isUpdatingUI}
             className="mt-4 w-full"
           >
             Re-generate Question
