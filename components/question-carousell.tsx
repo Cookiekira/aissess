@@ -40,7 +40,7 @@ export function QuestionCarousell() {
         loop: true
       }}
     >
-      <CarouselContent>
+      <CarouselContent className="items-center">
         {uiState.length > 0 ? (
           uiState.map(ui => (
             <CarouselItem key={ui.id}>
