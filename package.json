@@ -20,6 +20,7 @@
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-toast": "^1.2.1",
     "ai": "^3.3.28",
+    "babel-plugin-react-compiler": "0.0.0-experimental-6067d4e-20240924",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "embla-carousel-react": "^8.2.1",
