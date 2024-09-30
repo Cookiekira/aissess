@@ -1,16 +1,14 @@
 'use client'
 
-import {
-  PdfParserProvider,
-  useOnLoadPdfjsLib,
-  useSetPdfParser
-} from '@/hooks/use-pdf-parser'
 import { QuestionCarousell } from '@/components/question-carousell'
+import { useOnLoadPdfjsLib } from '@/hooks/use-pdf-parser'
 import { FileUploader } from '@/components/file-uploader'
+import { noop } from '@/lib/utils'
 import Script from 'next/script'
 
 export default function Home() {
   const onLoadPdfjsLib = useOnLoadPdfjsLib()
+  window.onload = noop
 
   return (
     <>
@@ -33,7 +31,12 @@ export default function Home() {
           </div>
         </div>
       </main>
-      <Script src="/lib/pdf.min.mjs" type="module" onLoad={onLoadPdfjsLib} />
+      <Script
+        src="/lib/pdf.min.mjs"
+        type="module"
+        onLoad={onLoadPdfjsLib}
+        crossOrigin={'anonymous'}
+      />
     </>
   )
 }

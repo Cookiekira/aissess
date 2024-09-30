@@ -32,23 +32,4 @@ export function createResolvablePromise<T = any>(): {
   }
 }
 
-// export function extractTextFromFile(
-//   file: File,
-//   parser: PDFParser
-// ): Promise<string> {
-
-//   const pdf = await pdfjs.getDocument(await file.arrayBuffer()).promise
-
-//   const extractedText: string = (
-//     await Promise.all(
-//       Array.from({ length: pdf.numPages }, async (_, i) => {
-//         const page = await pdf.getPage(i + 1)
-//         const textContent = await page.getTextContent()
-//         // @ts-expect-error - make TS happy...
-//         return textContent.items.map(item => item.str ?? '').join(' ')
-//       })
-//     )
-//   ).join(' ')
-
-//   return extractedText
-// }
+export function noop() {}

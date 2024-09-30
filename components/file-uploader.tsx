@@ -90,7 +90,6 @@ export function FileUploader() {
   const parser = usePdfParser()
   const [isUpdatingUI, startTransition] = useTransition()
 
-  console.log(parser)
   const updateQuestionUI = useCallback(
     async (input: string) => {
       setUiState(prevState => [
