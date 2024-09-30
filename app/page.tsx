@@ -8,7 +8,10 @@ import Script from 'next/script'
 
 export default function Home() {
   const onLoadPdfjsLib = useOnLoadPdfjsLib()
-  window.onload = noop
+  if (window) {
+    // to avoid the warning in the console
+    window.onload = noop
+  }
 
   return (
     <>
