@@ -1,31 +1,28 @@
 'use client'
 
-import { createResolvablePromise } from '@/lib/utils'
-import * as PDFJS from 'pdfjs-dist/types/src/pdf'
-import { use, useEffect, useState } from 'react'
+import { createContextState } from 'foxact/context-state'
+import { useCallback } from 'react'
 
-export function usePdfParser() {
-  // Dirty tricky way to make pdfjs work
-  const [pdfjs, setPdfjs] = useState<typeof PDFJS | null>(null)
+const [PdfParserProvider, usePdfParser, useSetPdfParser] = createContextState<
+  ((file: File) => Promise<string>) | null
+>(null)
 
-  const { promise, resolve } =
-    createResolvablePromise<(file: File) => Promise<string>>()
+export function useOnLoadPdfjsLib() {
+  const setPdfParser = useSetPdfParser()
 
-  useEffect(() => {
-    if (window.pdfjsLib) {
-      setPdfjs(window.pdfjsLib)
-      window.pdfjsLib.GlobalWorkerOptions.workerSrc = '/lib/pdf.worker.min.mjs'
+  return useCallback(() => {
+    if (!window.pdfjsLib) {
+      throw new Error('PDFJS not loaded.')
     }
-  }, [])
 
-  useEffect(() => {
-    // Return the parser function
-    resolve(async (file: File) => {
-      if (!pdfjs) throw new Error('PDFJS not loaded.')
-      if (!pdfjs.isPdfFile(file.name)) throw new Error('Invalid PDF file.')
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc = '/lib/pdf.worker.min.mjs'
 
-      const pdf = await pdfjs.getDocument(await file.arrayBuffer()).promise
-
+    setPdfParser(() => async (file: File) => {
+      if (!window.pdfjsLib) throw new Error('PDFJS not loaded.')
+      if (!window.pdfjsLib.isPdfFile(file.name))
+        throw new Error('Invalid PDF file.')
+      const pdf = await window.pdfjsLib.getDocument(await file.arrayBuffer())
+        .promise
       const extractedText: string = (
         await Promise.all(
           Array.from({ length: pdf.numPages }, async (_, i) => {
@@ -36,9 +33,9 @@ export function usePdfParser() {
           })
         )
       ).join(' ')
-
       return extractedText
     })
-  }, [resolve, pdfjs])
-  return { parser: promise, pdfjs }
+  }, [setPdfParser])
 }
+
+export { PdfParserProvider, usePdfParser, useSetPdfParser }

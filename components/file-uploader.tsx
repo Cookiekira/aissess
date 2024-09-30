@@ -38,7 +38,7 @@ const FormSchema = z.object({
 async function parseFile(
   prevState: FileState,
   formData: FormData,
-  parser: ReturnType<typeof usePdfParser>['parser']
+  parser: ReturnType<typeof usePdfParser>
 ) {
   const validatedFields = FormSchema.safeParse(
     Object.fromEntries(formData.entries())
@@ -53,9 +53,10 @@ async function parseFile(
   const { file } = validatedFields.data
 
   try {
+    if (parser === null) throw new Error('PDFJS not loaded.')
     let context = ''
     if (file.type === 'application/pdf') {
-      context = await (await parser)(file)
+      context = await parser(file)
     } else {
       context = await file.text()
     }
@@ -86,9 +87,10 @@ export function FileUploader() {
   const { submitUserContext } = useActions()
   const { toast } = useToast()
   const [uiState, setUiState] = useUIState<typeof AI>()
-  const { parser } = usePdfParser()
+  const parser = usePdfParser()
   const [isUpdatingUI, startTransition] = useTransition()
 
+  console.log(parser)
   const updateQuestionUI = useCallback(
     async (input: string) => {
       setUiState(prevState => [

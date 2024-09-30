@@ -4,7 +4,6 @@ import { Inter } from 'next/font/google'
 import type { Metadata } from 'next'
 import { AI } from '@/lib/actions'
 import { cn } from '@/lib/utils'
-import Script from 'next/script'
 import './globals.css'
 
 export const runtime = 'edge'
@@ -48,11 +47,6 @@ export default function RootLayout({
           <Provider>{children}</Provider>
         </AI>
         <Toaster />
-        <Script
-          src="/lib/pdf.min.mjs"
-          type="module"
-          strategy="beforeInteractive"
-        />
       </body>
     </html>
   )
