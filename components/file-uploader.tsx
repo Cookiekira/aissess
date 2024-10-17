@@ -2,7 +2,7 @@
 
 import { readStreamableValue, useActions, useUIState } from 'ai/rsc'
 import { useActionState, useCallback, useTransition } from 'react'
-import { AI, MCQContent, UIState } from '@/lib/actions'
+import type { AI, MCQContent, UIState } from '@/lib/actions'
 import { Question, QuestionSkeleton } from './question'
 import { usePdfParser } from '@/hooks/use-pdf-parser'
 import { Button } from '@/components/ui/button'
@@ -110,7 +110,7 @@ export function FileUploader() {
                     // Refreshing the question currently being generated
                     return acc
                   }
-                  return [curr, ...acc]
+                  return [curr].concat(acc)
                 },
                 [
                   {
