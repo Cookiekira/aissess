@@ -10,6 +10,7 @@ export default function Home() {
   const onLoadPdfjsLib = useOnLoadPdfjsLib()
   if (typeof window !== 'undefined') {
     // to avoid the warning in the console
+    // eslint-disable-next-line react-compiler/react-compiler
     window.onload = noop
   }
 

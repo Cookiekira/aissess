@@ -1,12 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/eslintrc",
-  "plugins": [
-    "tailwindcss",
-    "next-on-pages"
-  ],
-  "ignorePatterns": [
-    "components/ui/**/*"
-  ],
+  "plugins": ["tailwindcss", "next-on-pages", "react-compiler"],
+  "ignorePatterns": ["components/ui/**/*"],
   "extends": [
     "next/core-web-vitals",
     "plugin:next-on-pages/recommended",
@@ -14,6 +9,7 @@
   ],
   "rules": {
     "tailwindcss/no-custom-classname": "off",
-    "react/self-closing-comp": "warn"
+    "react/self-closing-comp": "warn",
+    "react-compiler/react-compiler": "error"
   }
 }
