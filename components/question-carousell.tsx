@@ -12,6 +12,7 @@ import { Question, QuestionSample, QuestionSkeleton } from './question'
 import { useEffect, useMemo, useState } from 'react'
 import { useQuestions } from '@/lib/questions'
 import { MCQContent } from '@/lib/schemas'
+import { toast } from '@/hooks/use-toast'
 import { DeepPartial } from 'ai'
 
 export type QuestionCarousellProps = {
@@ -35,10 +36,20 @@ export function QuestionCarousell({
       questions.reduce(
         (acc: { id: string; content: DeepPartial<MCQContent> }[], mcq) => {
           if (mcq.role === 'assistant') {
-            const content =
-              typeof mcq.content === 'string'
-                ? JSON.parse(mcq.content)
-                : mcq.content
+            let content
+            try {
+              content =
+                typeof mcq.content === 'string'
+                  ? JSON.parse(mcq.content)
+                  : mcq.content
+            } catch (error) {
+              toast({
+                title: 'Error',
+                description: 'Failed to parse the question.',
+                variant: 'destructive'
+              })
+              return acc
+            }
 
             // Check if the question is already in the list
             if (content.question !== currentMCQ?.question) {

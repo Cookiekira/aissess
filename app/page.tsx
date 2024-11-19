@@ -5,6 +5,7 @@ import { experimental_useObject as useObject } from 'ai/react'
 import { useOnLoadPdfjsLib } from '@/hooks/use-pdf-parser'
 import { FileUploader } from '@/components/file-uploader'
 import { useSetQuestions } from '@/lib/questions'
+import { toast } from '@/hooks/use-toast'
 import { mcqSchema } from '@/lib/schemas'
 import { noop } from '@/lib/utils'
 import Script from 'next/script'
@@ -31,6 +32,13 @@ export default function Home() {
           role: 'assistant'
         }
       ])
+    },
+    onError(error) {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive'
+      })
     }
   })
 
