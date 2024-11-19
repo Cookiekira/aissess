@@ -2,7 +2,6 @@ import { Toaster } from '@/components/ui/toaster'
 import { Provider } from '@/components/provider'
 import { Inter } from 'next/font/google'
 import type { Metadata } from 'next'
-import { AI } from '@/lib/actions'
 import { cn } from '@/lib/utils'
 import './globals.css'
 
@@ -43,9 +42,7 @@ export default function RootLayout({
         )}
       >
         <div className="absolute inset-0 -z-10 bg-radial" />
-        <AI>
-          <Provider>{children}</Provider>
-        </AI>
+        <Provider>{children}</Provider>
         <Toaster />
       </body>
     </html>

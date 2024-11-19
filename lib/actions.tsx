@@ -1,3 +1,5 @@
+// ! Deprecated: using AI SDK UI instead RSC
+
 import 'server-only'
 
 import { createAI, createStreamableValue, getMutableAIState } from 'ai/rsc'

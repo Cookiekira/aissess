@@ -36,6 +36,9 @@ importers:
       '@ai-sdk/google':
         specifier: ^1.0.0
         version: 1.0.0(zod@3.23.8)
+      '@ai-sdk/groq':
+        specifier: ^1.0.0
+        version: 1.0.0(zod@3.23.8)
       '@hookform/resolvers':
         specifier: ^3.9.1
         version: 3.9.1(react-hook-form@7.52.2(react@19.0.0-rc-66855b96-20241106))
@@ -174,6 +177,12 @@ packages:
 
   '@ai-sdk/google@1.0.0':
     resolution: {integrity: sha512-GXt17gZvA9QZdlvNamekLERfM2sWgAOkwHOwKGV2aVPx6lpWs46AMx/IfOi3qxoUjepj3ka0QQg0Ai8mHUPOSg==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.0.0
+
+  '@ai-sdk/groq@1.0.0':
+    resolution: {integrity: sha512-hiPq9Y8+VGInwhLJxowT+2VHIiWZNB9GcaMJb8335xdXEtlnmDGW3F2gCSwJ0cI+qvpsc0vhtsLYiCp77AfykA==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.0.0
@@ -4079,6 +4088,12 @@ packages:
 snapshots:
 
   '@ai-sdk/google@1.0.0(zod@3.23.8)':
+    dependencies:
+      '@ai-sdk/provider': 1.0.0
+      '@ai-sdk/provider-utils': 2.0.0(zod@3.23.8)
+      zod: 3.23.8
+
+  '@ai-sdk/groq@1.0.0(zod@3.23.8)':
     dependencies:
       '@ai-sdk/provider': 1.0.0
       '@ai-sdk/provider-utils': 2.0.0(zod@3.23.8)

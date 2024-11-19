@@ -8,7 +8,7 @@ import {
   CarouselNext,
   CarouselPrevious
 } from './ui/carousel'
-import { Question, QuestionSample } from './question'
+import { Question, QuestionSample, QuestionSkeleton } from './question'
 import { useEffect, useMemo, useState } from 'react'
 import { useQuestions } from '@/lib/questions'
 import { MCQContent } from '@/lib/schemas'
@@ -27,24 +27,32 @@ export function QuestionCarousell({
 
   const questions = useQuestions()
 
+  const showSkeleton = isLoading && !currentMCQ
+  const showCurrentMCQ = !!currentMCQ
+
   const mcqs = useMemo(
     () =>
       questions.reduce(
         (acc: { id: string; content: DeepPartial<MCQContent> }[], mcq) => {
           if (mcq.role === 'assistant') {
-            acc.push({
-              id: mcq.id,
-              content:
-                typeof mcq.content === 'string'
-                  ? JSON.parse(mcq.content)
-                  : mcq.content
-            })
+            const content =
+              typeof mcq.content === 'string'
+                ? JSON.parse(mcq.content)
+                : mcq.content
+
+            // Check if the question is already in the list
+            if (content.question !== currentMCQ?.question) {
+              acc.push({
+                id: mcq.id,
+                content
+              })
+            }
           }
           return acc
         },
         []
       ),
-    [questions]
+    [currentMCQ, questions]
   )
 
   useEffect(() => {
@@ -66,19 +74,34 @@ export function QuestionCarousell({
     <Carousel
       setApi={setApi}
       opts={{
-        duration: 35,
-        loop: true
+        duration: 35
       }}
     >
       <CarouselContent className="items-center">
-        {mcqs.length > 0 ? (
-          mcqs.map(mcq => (
-            <CarouselItem key={mcq.id}>
-              <div className="w-full p-2">
-                <Question id={mcq.id} content={mcq.content} />
-              </div>
-            </CarouselItem>
-          ))
+        {mcqs.length > 0 || showSkeleton || showCurrentMCQ ? (
+          <>
+            {mcqs.map(mcq => (
+              <CarouselItem key={mcq.id}>
+                <div className="w-full p-2">
+                  <Question id={mcq.id} content={mcq.content} />
+                </div>
+              </CarouselItem>
+            ))}
+            {showCurrentMCQ && (
+              <CarouselItem>
+                <div className="w-full p-2">
+                  <Question id="streaming" content={currentMCQ} />
+                </div>
+              </CarouselItem>
+            )}
+            {showSkeleton && (
+              <CarouselItem key="skeleton">
+                <div className="w-full p-2">
+                  <QuestionSkeleton />
+                </div>
+              </CarouselItem>
+            )}
+          </>
         ) : (
           <CarouselItem key="sample">
             <div className="w-full p-2">

@@ -1,17 +1,14 @@
 'use client'
 
+import { useQuestions, useSetQuestions } from '@/lib/questions'
 import { MCQMessage } from '@/app/api/generate-question/route'
+import { usePdfParser } from '@/hooks/use-pdf-parser'
+import { useActionState, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { usePdfParser } from '@/hooks/use-pdf-parser'
 import { useToast } from '@/hooks/use-toast'
-import { useQuestions, useSetQuestions } from '@/lib/questions'
 import { nanoid } from 'nanoid'
-import {
-  useActionState,
-  useCallback
-} from 'react'
 import { z } from 'zod'
 
 const ACCEPTED_FILE_TYPES = ['application/pdf', 'text/plain']
@@ -96,43 +93,6 @@ export function FileUploader({ isLoading, onSubmit }: FileUploaderProps) {
 
   const setQuestions = useSetQuestions()
   const questions = useQuestions()
-
-  // const updateQuestionUI = useCallback(
-  //   async (input: string) => {
-  //     setUiState(prevState => [
-  //       ...prevState,
-  //       {
-  //         id: 'skeleton',
-  //         display: <QuestionSkeleton />
-  //       }
-  //     ])
-  //     const { mcqId, mcqStream } = await submitUserContext(input)
-  //     for await (const mcq of readStreamableValue<MCQContent>(mcqStream)) {
-  //       if (mcq && Object.keys(mcq).length > 0) {
-  //         startTransition(() => {
-  //           setUiState(prevState =>
-  //             prevState.reduce(
-  //               (acc: UIState, curr: UIState[number]) => {
-  //                 if (curr.id === mcqId || curr.id === 'skeleton') {
-  //                   // Refreshing the question currently being generated
-  //                   return acc
-  //                 }
-  //                 return [curr].concat(acc)
-  //               },
-  //               [
-  //                 {
-  //                   id: mcqId,
-  //                   display: <Question id={mcqId} content={mcq} />
-  //                 }
-  //               ]
-  //             )
-  //           )
-  //         })
-  //       }
-  //     }
-  //   },
-  //   [setUiState, submitUserContext]
-  // )
 
   const handleGenerate = useCallback(
     async (prevState: FileState, formData: FormData) => {

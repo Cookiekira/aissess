@@ -1,6 +1,6 @@
 import { CoreMessage, streamObject } from 'ai'
 import { mcqSchema } from '@/lib/schemas'
-import { google } from '@ai-sdk/google'
+import { groq } from '@ai-sdk/groq'
 
 export const maxDuration = 60
 
@@ -12,10 +12,7 @@ export async function POST(req: Request) {
   const { context }: { context: CoreMessage[] } = await req.json()
 
   const result = streamObject({
-    model: google('gemini-1.5-flash-latest', {
-      // ? Workaround for right order of the output
-      structuredOutputs: false
-    }),
+    model: groq('llama-3.1-70b-versatile'),
     system: `You are about to generate a multiple-choice question based on the given text.\
                The result order should be: question, choices, answer, explanation.`,
     messages: context,

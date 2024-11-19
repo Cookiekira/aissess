@@ -9,7 +9,6 @@ import { mcqSchema } from '@/lib/schemas'
 import { noop } from '@/lib/utils'
 import Script from 'next/script'
 import { nanoid } from 'nanoid'
-import { object } from 'zod'
 
 export default function Home() {
   const onLoadPdfjsLib = useOnLoadPdfjsLib()
