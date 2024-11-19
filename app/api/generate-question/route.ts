@@ -14,7 +14,7 @@ export async function POST(req: Request) {
   const { context }: { context: CoreMessage[] } = await req.json()
 
   const result = streamObject({
-    model: google('gemini-1.5-flash-latest', {
+    model: google('gemini-1.5-flash-002', {
       // ? Workaround for right order of the output
       structuredOutputs: false
     }),
