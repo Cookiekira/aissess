@@ -1,15 +1,17 @@
 'use client'
 
-import { readStreamableValue, useActions, useUIState } from 'ai/rsc'
-import { useActionState, useCallback, useTransition } from 'react'
-import type { AI, MCQContent, UIState } from '@/lib/actions'
-import { Question, QuestionSkeleton } from './question'
-import { usePdfParser } from '@/hooks/use-pdf-parser'
+import { MCQMessage } from '@/app/api/generate-question/route'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { usePdfParser } from '@/hooks/use-pdf-parser'
 import { useToast } from '@/hooks/use-toast'
-import useSWRMutation from 'swr/mutation'
+import { useQuestions, useSetQuestions } from '@/lib/questions'
+import { nanoid } from 'nanoid'
+import {
+  useActionState,
+  useCallback
+} from 'react'
 import { z } from 'zod'
 
 const ACCEPTED_FILE_TYPES = ['application/pdf', 'text/plain']
@@ -83,79 +85,103 @@ async function parseFile(
   }
 }
 
-export function FileUploader() {
-  const { submitUserContext } = useActions()
+export type FileUploaderProps = {
+  isLoading: boolean
+  onSubmit: (data: { context: MCQMessage[] }) => void
+}
+
+export function FileUploader({ isLoading, onSubmit }: FileUploaderProps) {
   const { toast } = useToast()
-  const [uiState, setUiState] = useUIState<typeof AI>()
   const parser = usePdfParser()
-  const [isUpdatingUI, startTransition] = useTransition()
 
-  const updateQuestionUI = useCallback(
-    async (input: string) => {
-      setUiState(prevState => [
-        ...prevState,
-        {
-          id: 'skeleton',
-          display: <QuestionSkeleton />
-        }
-      ])
-      const { mcqId, mcqStream } = await submitUserContext(input)
-      for await (const mcq of readStreamableValue<MCQContent>(mcqStream)) {
-        if (mcq && Object.keys(mcq).length > 0) {
-          startTransition(() => {
-            setUiState(prevState =>
-              prevState.reduce(
-                (acc: UIState, curr: UIState[number]) => {
-                  if (curr.id === mcqId || curr.id === 'skeleton') {
-                    // Refreshing the question currently being generated
-                    return acc
-                  }
-                  return [curr].concat(acc)
-                },
-                [
-                  {
-                    id: mcqId,
-                    display: <Question id={mcqId} content={mcq} />
-                  }
-                ]
-              )
-            )
-          })
-        }
-      }
-    },
-    [setUiState, submitUserContext]
-  )
+  const setQuestions = useSetQuestions()
+  const questions = useQuestions()
 
-  const submit = useCallback(
+  // const updateQuestionUI = useCallback(
+  //   async (input: string) => {
+  //     setUiState(prevState => [
+  //       ...prevState,
+  //       {
+  //         id: 'skeleton',
+  //         display: <QuestionSkeleton />
+  //       }
+  //     ])
+  //     const { mcqId, mcqStream } = await submitUserContext(input)
+  //     for await (const mcq of readStreamableValue<MCQContent>(mcqStream)) {
+  //       if (mcq && Object.keys(mcq).length > 0) {
+  //         startTransition(() => {
+  //           setUiState(prevState =>
+  //             prevState.reduce(
+  //               (acc: UIState, curr: UIState[number]) => {
+  //                 if (curr.id === mcqId || curr.id === 'skeleton') {
+  //                   // Refreshing the question currently being generated
+  //                   return acc
+  //                 }
+  //                 return [curr].concat(acc)
+  //               },
+  //               [
+  //                 {
+  //                   id: mcqId,
+  //                   display: <Question id={mcqId} content={mcq} />
+  //                 }
+  //               ]
+  //             )
+  //           )
+  //         })
+  //       }
+  //     }
+  //   },
+  //   [setUiState, submitUserContext]
+  // )
+
+  const handleGenerate = useCallback(
     async (prevState: FileState, formData: FormData) => {
       const state = await parseFile(prevState, formData, parser)
 
-      if (!state.error) {
-        updateQuestionUI(state.context)
-      } else {
+      if (state.error) {
         toast({
           title: 'Error',
           description: state.error,
           variant: 'destructive',
           duration: 2000
         })
+      } else {
+        const initialContext: MCQMessage = {
+          id: nanoid(),
+          content: state.context,
+          role: 'user'
+        }
+
+        setQuestions([initialContext])
+
+        onSubmit({
+          context: [initialContext]
+        })
       }
+
       return state
     },
-    [parser, toast, updateQuestionUI]
+    [onSubmit, parser, setQuestions, toast]
   )
 
-  const { trigger, isMutating: isReGenerating } = useSWRMutation(
-    're-generate-question',
-    async () => await updateQuestionUI('Next Question')
-  )
-
-  const [state, formAction, isPending] = useActionState(submit, {
+  const [state, formAction, isPending] = useActionState(handleGenerate, {
     context: '',
     fileName: '',
     error: null
   })
+
+  const handleRegenerate = useCallback(() => {
+    const context: MCQMessage[] = [
+      ...questions,
+      {
+        id: nanoid(),
+        content: 'Next question',
+        role: 'user'
+      }
+    ]
+    setQuestions(context)
+    onSubmit({ context })
+  }, [questions, setQuestions, onSubmit])
 
   return (
     <>
@@ -177,20 +203,14 @@ export function FileUploader() {
           {state.error && <p className="text-sm text-red-500">{state.error}</p>}
         </div>
         {!state.fileName ? (
-          <Button
-            type="submit"
-            disabled={isPending || isUpdatingUI}
-            className="mt-4 w-full"
-          >
+          <Button type="submit" disabled={isPending} className="mt-4 w-full">
             Generate Question
           </Button>
         ) : (
           <Button
             type="button"
-            onClick={() => {
-              trigger()
-            }}
-            disabled={isReGenerating || isPending || isUpdatingUI}
+            onClick={handleRegenerate}
+            disabled={isLoading || isPending}
             className="mt-4 w-full"
           >
             Re-generate Question

@@ -8,14 +8,44 @@ import {
   CarouselNext,
   CarouselPrevious
 } from './ui/carousel'
-import { QuestionSample } from './question'
-import { useEffect, useState } from 'react'
-import { useUIState } from 'ai/rsc'
-import { AI } from '@/lib/actions'
+import { Question, QuestionSample } from './question'
+import { useEffect, useMemo, useState } from 'react'
+import { useQuestions } from '@/lib/questions'
+import { MCQContent } from '@/lib/schemas'
+import { DeepPartial } from 'ai'
 
-export function QuestionCarousell() {
-  const [uiState] = useUIState<typeof AI>()
+export type QuestionCarousellProps = {
+  isLoading: boolean
+  currentMCQ: DeepPartial<MCQContent> | undefined
+}
+
+export function QuestionCarousell({
+  isLoading,
+  currentMCQ
+}: QuestionCarousellProps) {
   const [api, setApi] = useState<CarouselApi>()
+
+  const questions = useQuestions()
+
+  const mcqs = useMemo(
+    () =>
+      questions.reduce(
+        (acc: { id: string; content: DeepPartial<MCQContent> }[], mcq) => {
+          if (mcq.role === 'assistant') {
+            acc.push({
+              id: mcq.id,
+              content:
+                typeof mcq.content === 'string'
+                  ? JSON.parse(mcq.content)
+                  : mcq.content
+            })
+          }
+          return acc
+        },
+        []
+      ),
+    [questions]
+  )
 
   useEffect(() => {
     if (!api) return
@@ -41,10 +71,12 @@ export function QuestionCarousell() {
       }}
     >
       <CarouselContent className="items-center">
-        {uiState.length > 0 ? (
-          uiState.map(ui => (
-            <CarouselItem key={ui.id}>
-              <div className="w-full p-2">{ui.display}</div>
+        {mcqs.length > 0 ? (
+          mcqs.map(mcq => (
+            <CarouselItem key={mcq.id}>
+              <div className="w-full p-2">
+                <Question id={mcq.id} content={mcq.content} />
+              </div>
             </CarouselItem>
           ))
         ) : (

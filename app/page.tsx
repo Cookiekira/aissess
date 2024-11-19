@@ -1,10 +1,15 @@
 'use client'
 
 import { QuestionCarousell } from '@/components/question-carousell'
+import { experimental_useObject as useObject } from 'ai/react'
 import { useOnLoadPdfjsLib } from '@/hooks/use-pdf-parser'
 import { FileUploader } from '@/components/file-uploader'
+import { useSetQuestions } from '@/lib/questions'
+import { mcqSchema } from '@/lib/schemas'
 import { noop } from '@/lib/utils'
 import Script from 'next/script'
+import { nanoid } from 'nanoid'
+import { object } from 'zod'
 
 export default function Home() {
   const onLoadPdfjsLib = useOnLoadPdfjsLib()
@@ -13,6 +18,22 @@ export default function Home() {
     // eslint-disable-next-line react-compiler/react-compiler
     window.onload = noop
   }
+
+  const setQuestions = useSetQuestions()
+  const { submit, isLoading, object } = useObject({
+    api: '/api/generate-question',
+    schema: mcqSchema,
+    onFinish({ object }) {
+      setQuestions(prevState => [
+        ...prevState,
+        {
+          id: nanoid(),
+          content: JSON.stringify(object),
+          role: 'assistant'
+        }
+      ])
+    }
+  })
 
   return (
     <>
@@ -25,12 +46,12 @@ export default function Home() {
                 Upload a PDF or text file and let our AI generate
                 multiple-choice questions to test your knowledge.
               </p>
-              <FileUploader />
+              <FileUploader isLoading={isLoading} onSubmit={submit} />
             </div>
 
             {/* min-w-0 fix the classic overflow issue */}
             <div className="min-w-0 md:col-span-5">
-              <QuestionCarousell />
+              <QuestionCarousell isLoading={isLoading} currentMCQ={object} />
             </div>
           </div>
         </div>
