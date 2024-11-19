@@ -4,6 +4,8 @@ import { groq } from '@ai-sdk/groq'
 
 export const maxDuration = 60
 
+export const runtime = 'edge'
+
 export type MCQMessage = CoreMessage & {
   id: string
 }
