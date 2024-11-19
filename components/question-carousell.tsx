@@ -12,7 +12,7 @@ import { Question, QuestionSample, QuestionSkeleton } from './question'
 import { useEffect, useMemo, useState } from 'react'
 import { useQuestions } from '@/lib/questions'
 import { MCQContent } from '@/lib/schemas'
-import { toast } from '@/hooks/use-toast'
+import { toast, useToast } from '@/hooks/use-toast'
 import { DeepPartial } from 'ai'
 
 export type QuestionCarousellProps = {
@@ -25,6 +25,7 @@ export function QuestionCarousell({
   currentMCQ
 }: QuestionCarousellProps) {
   const [api, setApi] = useState<CarouselApi>()
+  const { toast } = useToast()
 
   const questions = useQuestions()
 
