@@ -10,9 +10,9 @@ import {
 } from './ui/carousel'
 import { Question, QuestionSample, QuestionSkeleton } from './question'
 import { useEffect, useMemo, useState } from 'react'
+import { toast, useToast } from '@/hooks/use-toast'
 import { useQuestions } from '@/lib/questions'
 import { MCQContent } from '@/lib/schemas'
-import { toast, useToast } from '@/hooks/use-toast'
 import { DeepPartial } from 'ai'
 
 export type QuestionCarousellProps = {
@@ -53,7 +53,7 @@ export function QuestionCarousell({
             }
 
             // Check if the question is already in the list
-            if (content.question !== currentMCQ?.question) {
+            if (content.question && content.question !== currentMCQ?.question) {
               acc.push({
                 id: mcq.id,
                 content
@@ -64,7 +64,7 @@ export function QuestionCarousell({
         },
         []
       ),
-    [currentMCQ, questions]
+    [currentMCQ?.question, questions, toast]
   )
 
   useEffect(() => {
