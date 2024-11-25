@@ -53,7 +53,7 @@ export function QuestionCarousell({
             }
 
             // Check if the question is already in the list
-            if (content?.question && content.question !== currentMCQ?.question) {
+            if (content.question !== currentMCQ?.question) {
               acc.push({
                 id: mcq.id,
                 content

@@ -14,9 +14,8 @@ export async function POST(req: Request) {
   const { context }: { context: CoreMessage[] } = await req.json()
 
   const result = streamObject({
-    model: google('gemini-1.5-flash-002', {
-      // ? Workaround for right order of the output
-      structuredOutputs: false
+    model: google('gemini-1.5-flash-latest', {
+      structuredOutputs: true
     }),
     system: `You are about to generate a multiple-choice question based on the given text.\
                The result order should be: question, choices, answer, explanation.`,

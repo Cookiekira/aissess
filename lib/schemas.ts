@@ -1,4 +1,4 @@
-import { CoreMessage, DeepPartial } from 'ai'
+import { DeepPartial } from 'ai'
 import { z } from 'zod'
 
 export const mcqSchema = z.object({
