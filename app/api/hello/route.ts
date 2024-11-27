@@ -1,10 +1,13 @@
 import type { NextRequest } from 'next/server'
-import { getRequestContext } from '@cloudflare/next-on-pages'
+// import { getRequestContext } from '@cloudflare/next-on-pages'
 
 export const runtime = 'edge'
 
-export async function GET(request: NextRequest) {
-  let responseText = 'Hello World'
+export function GET(request: NextRequest) {
+  // const context = getRequestContext()
+  console.log(request.headers.get('user-agent'))
+
+  const responseText = 'Hello World'
 
   // In the edge runtime you can use Bindings that are available in your application
   // (for more details see:

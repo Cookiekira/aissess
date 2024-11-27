@@ -1,7 +1,7 @@
 'use client'
 
+import type { MCQMessage } from '@/app/api/generate-question/route'
 import { useQuestions, useSetQuestions } from '@/lib/questions'
-import { MCQMessage } from '@/app/api/generate-question/route'
 import { usePdfParser } from '@/hooks/use-pdf-parser'
 import { useActionState, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
@@ -25,11 +25,11 @@ const FormSchema = z.object({
     .instanceof(File)
     .refine(file => file.name !== '', 'Please select a file to upload.')
     .refine(
-      file => file && file.size !== 0 && file.size <= MAX_UPLOAD_SIZE,
+      file => file.size !== 0 && file.size <= MAX_UPLOAD_SIZE,
       'Max file size is 5MB.'
     )
     .refine(
-      file => file && ACCEPTED_FILE_TYPES.includes(file.type),
+      file => ACCEPTED_FILE_TYPES.includes(file.type),
       'Invalid file type. Please upload a PDF or text file.'
     )
 })
@@ -83,8 +83,8 @@ async function parseFile(
 }
 
 export type FileUploaderProps = {
-  isLoading: boolean
-  onSubmit: (data: { context: MCQMessage[] }) => void
+  readonly isLoading: boolean
+  readonly onSubmit: (data: { context: MCQMessage[] }) => void
 }
 
 export function FileUploader({ isLoading, onSubmit }: FileUploaderProps) {

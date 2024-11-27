@@ -2,7 +2,6 @@
 
 import {
   Carousel,
-  CarouselApi,
   CarouselContent,
   CarouselItem,
   CarouselNext,
@@ -10,15 +9,16 @@ import {
 } from './ui/carousel'
 import { Question, QuestionSample, QuestionSkeleton } from './question'
 import { useEffect, useMemo, useState } from 'react'
-import { toast, useToast } from '@/hooks/use-toast'
+import type { CarouselApi } from './ui/carousel'
+import type { MCQContent } from '@/lib/schemas'
 import { useQuestions } from '@/lib/questions'
-import { MCQContent } from '@/lib/schemas'
-import { DeepPartial } from 'ai'
+import { useToast } from '@/hooks/use-toast'
+import type { DeepPartial } from 'ai'
 
-export type QuestionCarousellProps = {
+export type QuestionCarousellProps = Readonly<{
   isLoading: boolean
   currentMCQ: DeepPartial<MCQContent> | undefined
-}
+}>
 
 export function QuestionCarousell({
   isLoading,
@@ -41,9 +41,9 @@ export function QuestionCarousell({
             try {
               content =
                 typeof mcq.content === 'string'
-                  ? JSON.parse(mcq.content)
-                  : mcq.content
-            } catch (error) {
+                  ? (JSON.parse(mcq.content) as DeepPartial<MCQContent>)
+                  : (mcq.content as DeepPartial<MCQContent>)
+            } catch {
               toast({
                 title: 'Error',
                 description: 'Failed to parse the question.',

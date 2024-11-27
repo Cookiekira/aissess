@@ -1,10 +1,11 @@
+/* eslint-disable security/detect-object-injection */
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { RadioGroup, RadioGroupItem } from './ui/radio-group'
 import { AnimatedText } from './animated-text'
 import React, { memo, useState } from 'react'
-import { MCQContent } from '@/lib/actions'
+import type { MCQContent } from '@/lib/actions'
 import { Skeleton } from './ui/skeleton'
 import { Label } from './ui/label'
 import { cn } from '@/lib/utils'
@@ -15,11 +16,11 @@ export const Question = memo(function Question({
   id,
   content,
   className
-}: {
+}: Readonly<{
   id: string
   content: MCQContent
   className?: React.HTMLAttributes<'div'>['className']
-}) {
+}>) {
   const [selected, setSelected] = useState<string>()
 
   const isRightAnswer = (input: string) => {
@@ -47,9 +48,9 @@ export const Question = memo(function Question({
                   <div
                     key={index}
                     className={cn(
-                      `flex items-start gap-2 p-2 rounded-lg
+                      `flex items-start gap-2 rounded-lg p-2
 
-                       hover:shadow-md hover:bg-sky-100
+                       hover:bg-sky-100 hover:shadow-md
                        [&:has([data-state="checked"])]:shadow-md
                        `,
                       // Check if the selected answer is the correct answer
@@ -60,16 +61,16 @@ export const Question = memo(function Question({
                       selected &&
                         !isSelected(index) &&
                         isRightAnswer(ANSWER[index]) &&
-                        'bg-success hover:bg-success shadow-md'
+                        'bg-success shadow-md hover:bg-success'
                     )}
                   >
                     <RadioGroupItem
                       value={ANSWER[index]}
-                      id={`${id}-${index}`}
+                      id={`${id}-${String(index)}`}
                       className="peer"
                     />
                     <Label
-                      htmlFor={`${id}-${index}`}
+                      htmlFor={`${id}-${String(index)}`}
                       className={cn(
                         'cursor-pointer leading-4',
 
@@ -133,9 +134,9 @@ export function QuestionSkeleton() {
 
 export function QuestionSample({
   className
-}: {
+}: Readonly<{
   className?: React.HTMLAttributes<'div'>['className']
-}) {
+}>) {
   return (
     <Question
       className={className}

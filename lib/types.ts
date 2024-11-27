@@ -1,7 +1,7 @@
-export {}
+import type PDFJS from 'pdfjs-dist'
 
 declare global {
   interface Window {
-    pdfjsLib: typeof import('pdfjs-dist/types/src/pdf')
+    pdfjsLib: typeof PDFJS
   }
 }

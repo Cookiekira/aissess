@@ -1,4 +1,5 @@
-import { CoreMessage, streamObject } from 'ai'
+import type { CoreMessage} from 'ai';
+import { streamObject } from 'ai'
 import { mcqSchema } from '@/lib/schemas'
 import { google } from '@ai-sdk/google'
 

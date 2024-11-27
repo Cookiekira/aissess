@@ -1,11 +1,11 @@
 import { m } from 'framer-motion'
 
 export type AnimatedTextProps = {
-  text: string
-  el?: React.ElementType
-  duration?: number
-  delay?: number
-  className?: string
+  readonly text: string
+  readonly el?: React.ElementType
+  readonly duration?: number
+  readonly delay?: number
+  readonly className?: string
 }
 
 const defaultVariants = {
@@ -32,6 +32,7 @@ export function AnimatedText({
         aria-hidden
       >
         {text.split('').map((char, index) => (
+          // eslint-disable-next-line @eslint-react/no-array-index-key
           <m.span key={index} variants={defaultVariants}>
             {char}
           </m.span>

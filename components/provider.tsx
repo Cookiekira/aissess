@@ -7,7 +7,7 @@ import { LazyMotion, m } from 'framer-motion'
 const loadFramerFeatures = () =>
   import('./framer-features').then(res => res.default)
 
-export type LayoutProps = React.PropsWithChildren
+export type LayoutProps = Readonly<React.PropsWithChildren>
 
 export function Provider({ children }: LayoutProps) {
   return (

@@ -3,7 +3,8 @@
 import 'server-only'
 
 import { createAI, createStreamableValue, getMutableAIState } from 'ai/rsc'
-import { CoreMessage, DeepPartial, generateId, streamObject } from 'ai'
+import type { CoreMessage, DeepPartial} from 'ai';
+import { generateId, streamObject } from 'ai'
 import { runAsyncFnWithoutBlocking } from './utils'
 import { Question } from '@/components/question'
 import { google } from '@ai-sdk/google'
@@ -22,7 +23,7 @@ const MCQ_CONTENT = z.object({
 
 export type MCQContent = DeepPartial<z.infer<typeof MCQ_CONTENT>>
 
-async function submitUserContext(content: string) {
+function submitUserContext(content: string) {
   'use server'
 
   const aiState = getMutableAIState<typeof AI>()
@@ -112,11 +113,11 @@ export const getUIStateFromAIState = (aiState: AIState): UIState => {
   return aiState.messages
     .filter(message => message.role === 'tool')
     .map((message, index) => ({
-      id: `${aiState.assessId}-${index}`,
+      id: `${aiState.assessId}-${index.toString()}`,
       display: message.content.map(tool => {
         return tool.toolName === 'generate_mcq' ? (
           <>
-            {/* @ts-expect-error */}
+            {/* @ts-expect-error: Fix type */}
             <Question id={tool.toolCallId} content={tool.result} />
           </>
         ) : (
