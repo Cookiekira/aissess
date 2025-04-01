@@ -48,9 +48,9 @@ function submitUserContext(content: string) {
 
   runAsyncFnWithoutBlocking(async () => {
     const { partialObjectStream } = streamObject({
-      model: google('gemini-1.5-flash-latest', {
-        // ? Workaround for right order of the output
-        structuredOutputs: false
+      model: google('gemini-2.0-flash-exp', {
+        // // ? Workaround for right order of the output
+        // structuredOutputs: false
       }),
       system: `You are about to generate a multiple-choice question based on the given text.\
                The result order should be: question, choices, answer, explanation.`,
