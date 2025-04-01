@@ -48,7 +48,7 @@ function submitUserContext(content: string) {
 
   runAsyncFnWithoutBlocking(async () => {
     const { partialObjectStream } = streamObject({
-      model: google('gemini-1.5-flash-latest', {
+      model: google('gemini-2.0-flash', {
         // ? Workaround for right order of the output
         structuredOutputs: false
       }),
